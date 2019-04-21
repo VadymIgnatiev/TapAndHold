@@ -1,60 +1,100 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Assets.Scripts.Static;
+using System.Collections;
 using UnityEngine;
+using Zenject;
 
 namespace Assets.Scripts.SceneObjects.Camera
 {
-    public class CameraFacade : MonoBehaviour//, ISceneCamera
+    public class CameraFacade : MonoBehaviour, ICameraFacade
     {        
-        private Transform m_TargetTransform;
-        private float m_RotationSpeed;
-        private Vector3 m_Offset;
+        [Inject]
+        private CameraSettings m_CameraSettings;
 
-        //[Inject]
-        //private CameraSettings m_CameraSettings;
+        [Inject]
+        private GameSettings m_GameSettings;
 
-        //void Start()
-        //{
-        //    m_RotationSpeed = m_CameraSettings.RotationSpead;
-        //    SetCameraToTarget();
-        //}
+        private float m_RoundStep;
+        private Vector3 m_InitPosition;
+        private float m_CameraFieldofView;
+        private float m_FollowTowerSpeed;
+        private Vector3 m_NextStepPosition;
+        private Vector3 m_ShowTowerPosition;
+        private float m_ShowTowerTime;
+        private float m_ShowTowerSpeed;
+        public bool m_NeedMoveCamera;
+        public bool m_NeedShowTower;
+        public bool m_NeedSetToInitPosition;
 
-        //private void SetCameraToTarget()
-        //{
-        //    float x = m_TargetTransform.position.x;
-        //    float y = m_TargetTransform.position.y;
-        //    float z = m_TargetTransform.position.z - m_CameraSettings.CameraOffset;
+        void Start()
+        {
+            m_RoundStep = m_GameSettings.RoundStep;
+            m_InitPosition = m_CameraSettings.InitialPosition;
+            m_CameraFieldofView = m_CameraSettings.CameraFieldofView;
+            m_FollowTowerSpeed = m_CameraSettings.FollowTowerSpeed;
+            m_ShowTowerTime = m_CameraSettings.ShowTowerTime;
+            SetToInitPosition();
+        }
 
-        //    transform.position = new Vector3(x, y, z);
+        public void Update()
+        {
+            if (m_NeedMoveCamera)
+                MoveCameraByTower();
 
-        //    m_Offset = m_TargetTransform.position - transform.position;
-        //}
+            if (m_NeedShowTower)
+                MoveToShowCamera();
 
-        //public void SetTargetTransform(Transform targetTransform)
-        //{
-        //    m_TargetTransform = targetTransform;
-        //    SetCameraToTarget();
-        //}
+            if (m_NeedSetToInitPosition)
+                MoveToInitPosition();
+        }
 
-        //public void LateUpdate()
-        //{
-        //    float horizontal = 0;
-        //    if (Input.GetMouseButton(0))
-        //    {
-        //        horizontal = Input.GetAxis("Mouse X") * m_RotationSpeed;
-        //    }
+        public void SetToInitPosition()
+        {
+            m_NeedSetToInitPosition = true;
+            m_NeedShowTower = false;
+            m_NeedMoveCamera = false;
+        }
 
-        //    m_TargetTransform.Rotate(0, horizontal, 0);
+        public void MoveToInitPosition()
+        {
+            transform.position = m_InitPosition;
+            m_NeedSetToInitPosition = false;
+            Debug.Log("m_InitPosition" + m_InitPosition);
+        }
 
-        //    float desiredAngle = m_TargetTransform.eulerAngles.y;
-        //    Quaternion rotation = Quaternion.Euler(0, desiredAngle, 0);
-        //    transform.position = m_TargetTransform.position - (rotation * m_Offset);
+        public void MoveToOneStep()
+        {
+            m_NextStepPosition = new Vector3(transform.position.x, transform.position.y + m_RoundStep, transform.position.z);
+            
+            m_NeedMoveCamera = true;
+        }                        
 
-        //    transform.LookAt(m_TargetTransform);
-        //}
+        public void MoveCameraByTower()
+        {
+            transform.position = Vector3.Lerp(transform.position, m_NextStepPosition, m_FollowTowerSpeed * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, m_NextStepPosition) < 0.001f)
+                m_NeedMoveCamera = false;
+        }
+
+        public void ShowTower()
+        {
+            m_NeedShowTower = true;
+            float height = (transform.position.y - m_InitPosition.y) / 2;
+            float distance = height / Mathf.Tan(Mathf.Deg2Rad * m_CameraFieldofView / 2);
+
+            m_ShowTowerPosition = new Vector3(m_InitPosition.x, m_InitPosition.y + height, m_InitPosition.z - distance);
+
+            m_ShowTowerSpeed = (transform.position - m_ShowTowerPosition).magnitude / m_ShowTowerTime;
+        }
+
+        private void MoveToShowCamera()
+        {
+            transform.position = Vector3.Lerp(transform.position, m_ShowTowerPosition, m_ShowTowerSpeed * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, m_ShowTowerPosition) < 0.001f)
+                m_NeedShowTower = false;
+        }
+        
     }
 }
 

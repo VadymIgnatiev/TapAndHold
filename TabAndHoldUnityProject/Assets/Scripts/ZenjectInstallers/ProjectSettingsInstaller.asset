@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32326ac8ef4a54649a5f43dbc9873759, type: 3}
+  m_Name: ProjectSettingsInstaller
+  m_EditorClassIdentifier: 
+  CameraSettings:
+    InitialPosition: {x: 0, y: 0.7, z: -3.5}
+    FollowTowerSpeed: 3
+    CameraFieldofView: 60
+    ShowTowerTime: 0.5
+  GameSettings:
+    RoundStep: 0.25
+    ExtensionSpeed: 1
+    CylinderPrefab: {fileID: 5940357890880022411, guid: 8eb84807bd4dbcc48b1a4667ad18bb3c,
+      type: 3}
+    TowerBase: {fileID: 5940357890880022411, guid: 8eb84807bd4dbcc48b1a4667ad18bb3c,
+      type: 3}
+    CylinderPrecision: 0.05
+    GameOverDestroyTime: 1
+  CylinderSettings:
+    DefaultTextures:
+    - {fileID: 2100000, guid: 8bd1e0f7f470a044c9a6b86a4c39edbc, type: 2}
+    - {fileID: 2100000, guid: 0ab75fee78b1ca941b8e85f034c0a0fb, type: 2}
+    - {fileID: 2100000, guid: 2f3bc8b007b7854438b8e945cde2b025, type: 2}
+    - {fileID: 2100000, guid: 79cf6ec601d6f894da8034d26b614b12, type: 2}
+    GameOverTexture: {fileID: 2100000, guid: 5372b19bce5f4ec479c0c29b68c7072b, type: 2}
